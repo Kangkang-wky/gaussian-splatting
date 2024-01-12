@@ -23,7 +23,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
     """
  
     # Create zero tensor. We will use it to make pytorch return gradients of the 2D (screen-space) means
-    screenspace_points = torch.zeros_like(pc.get_xyz, dtype=pc.get_xyz.dtype, requires_grad=True, device="cuda") + 0
+    means2d_size = (pc.get_xyz.size(0), 2)
+    screenspace_points = torch.zeros(means2d_size, dtype=pc.get_xyz.dtype, requires_grad=True, device="cuda") + 0
     try:
         screenspace_points.retain_grad()
     except:
@@ -77,7 +78,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
             sh2rgb = eval_sh(pc.active_sh_degree, shs_view, dir_pp_normalized)
             colors_precomp = torch.clamp_min(sh2rgb + 0.5, 0.0)
         else:
-            shs = pc.get_features
+            shs_feature_dc = pc.get_features_dc
+            shs_feature_rest = pc.get_features_rest
     else:
         colors_precomp = override_color
 
@@ -85,7 +87,8 @@ def render(viewpoint_camera, pc : GaussianModel, pipe, bg_color : torch.Tensor, 
     rendered_image, radii = rasterizer(
         means3D = means3D,
         means2D = means2D,
-        shs = shs,
+        shs_feature_dc = shs_feature_dc,
+        shs_feature_rest = shs_feature_rest,
         colors_precomp = colors_precomp,
         opacities = opacity,
         scales = scales,
