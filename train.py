@@ -71,7 +71,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
                 network_gui.conn = None
 
         iter_start.record()
-        torch.cuda.nvtx.range_push("render before")
+        # torch.cuda.nvtx.range_push("render before")
         gaussians.update_learning_rate(iteration)
 
         # Every 1000 its we increase the levels of SH up to a maximum degree
@@ -82,9 +82,9 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
         if not viewpoint_stack:
             viewpoint_stack = scene.getTrainCameras().copy()
         viewpoint_cam = viewpoint_stack.pop(randint(0, len(viewpoint_stack)-1))
-        torch.cuda.nvtx.range_pop()
+        # torch.cuda.nvtx.range_pop()
 
-        torch.cuda.nvtx.range_push("Render")
+        # torch.cuda.nvtx.range_push("Render")
         # Render
         if (iteration - 1) == debug_from:
             pipe.debug = True
@@ -93,22 +93,22 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
 
         render_pkg = render(viewpoint_cam, gaussians, pipe, bg)
         image, viewspace_point_tensor, visibility_filter, radii = render_pkg["render"], render_pkg["viewspace_points"], render_pkg["visibility_filter"], render_pkg["radii"]
-        torch.cuda.nvtx.range_pop()
+        # torch.cuda.nvtx.range_pop()
 
-        torch.cuda.nvtx.range_push("loss")
+        # torch.cuda.nvtx.range_push("loss")
         # Loss
         gt_image = viewpoint_cam.original_image.cuda()
         Ll1 = l1_loss(image, gt_image)
         loss = (1.0 - opt.lambda_dssim) * Ll1 + opt.lambda_dssim * (1.0 - ssim(image, gt_image))
-        torch.cuda.nvtx.range_pop()
+        # torch.cuda.nvtx.range_pop()
 
-        torch.cuda.nvtx.range_push("backward")
+        # torch.cuda.nvtx.range_push("backward")
         loss.backward()
-        torch.cuda.nvtx.range_pop()
+        # torch.cuda.nvtx.range_pop()
         
         iter_end.record()
 
-        torch.cuda.nvtx.range_push("other")
+        # torch.cuda.nvtx.range_push("other")
         with torch.no_grad():
             # Progress bar
             ema_loss_for_log = 0.4 * loss.item() + 0.6 * ema_loss_for_log
@@ -155,7 +155,7 @@ def training(dataset, opt, pipe, testing_iterations, saving_iterations, checkpoi
                 print("\n[ITER {}] Saving Checkpoint".format(iteration))
                 torch.save((gaussians.capture(), iteration), scene.model_path + "/chkpnt" + str(iteration) + ".pth")
 
-        torch.cuda.nvtx.range_pop()
+        # torch.cuda.nvtx.range_pop()
 
 def prepare_output_and_logger(args):    
     if not args.model_path:

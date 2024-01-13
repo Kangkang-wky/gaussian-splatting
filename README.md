@@ -23,7 +23,7 @@ Through nsight system, you can notice that rendercuda kernel takes a lot of time
 
 ## Performance
 
-Currently, end-to-end time improvement has been achieved, with 1.8x faster under 7000 iterations than original implementation, 2x faster under 30000 iterations, 6-9x in backward rendercuda kernel in training, which are tested in A100.
+Currently, end-to-end time improvement has been achieved, with 1.5x faster under 7000 iterations than original implementation, 1.2x faster under 30000 iterations, 6-8x in backward rendercuda kernel in training, which are tested in A100.
 
 ## 🚫 Commercial Use Disclaimer
 
