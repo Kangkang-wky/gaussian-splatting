@@ -30,7 +30,7 @@ def render_set(model_path, name, iteration, views, gaussians, pipeline, backgrou
     makedirs(gts_path, exist_ok=True)
 
     for idx, view in enumerate(tqdm(views, desc="Rendering progress")):
-        if idx < 1:
+        if idx < 40:
             rendering = render(view, gaussians, pipeline, background)["render"]
             gt = view.original_image[0:3, :, :]
             ps_val = psnr(rendering, gt).mean()
